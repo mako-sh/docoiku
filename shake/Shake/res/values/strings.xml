@@ -1,0 +1,10 @@
+<resources>
+
+    <string name="app_name">EnjoyYourLive</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">EnjoyYourLive</string>
+    <string name="summary">Acceleration Sensor</string>
+    <string name="shake_count">シェイク数 : %s</string>
+    <string name="label_shake">シェイクカウンター</string>
+
+</resources>
