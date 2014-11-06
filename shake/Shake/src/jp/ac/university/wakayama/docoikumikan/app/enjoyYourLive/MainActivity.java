@@ -1,14 +1,17 @@
 package jp.ac.university.wakayama.docoikumikan.app.enjoyYourLive;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.util.List;
 
-import jp.ac.university.wakayama.docoikumikan.app.enjoyYourLive.R;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
@@ -16,6 +19,8 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Switch;
 import android.widget.TextView;
+import java.net.URL;
+
 
 public class MainActivity extends Activity {
     // シェイクと判定するしきい値
@@ -28,6 +33,8 @@ public class MainActivity extends Activity {
     private float mPrevX;
     private float mPrevY;
     private float mPrevZ;
+ //   private final static String URL="http://192.168.51.108:3000/php/";
+    private final static String URL="http://192.168.43.15:3000/php/";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,8 +94,13 @@ public class MainActivity extends Activity {
                         mCount++;
                         mTvShakeCounter.setText(getString(R.string.shake_count, mCount));
                         
-                    	if( mCount >= 20) {
-                        	
+                    	if( mCount >= 10) {
+
+                    		wemot();
+                    		
+                            mSensorManager.unregisterListener(mSensorEventListener);
+                            mTvShakeCounter.setText(getString(R.string.shake_count, 0));
+                    		
                     		Log.v("Move","mCount was over 20.");
                     		Intent intent = new Intent(MainActivity.this,FinishActivity.class);
                     		startActivity(intent);
@@ -111,6 +123,93 @@ public class MainActivity extends Activity {
             }
         };
     }
+            
+
+	public void wemot() {
+	
+
+
+        //HTTP通信
+
+       try {
+    	   Log.v("Move","move to wemot");
+    	   
+            String str= http2str(URL);
+
+        	Log.v("result",str);
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    
+
+    //HTTP通信→文字列
+
+	private static String http2str(String path) throws Exception { 
+		Log.v("move","move to http2str");
+
+        byte[] w=http2data(path);
+
+        Log.v("move"," "+ w);
+        
+        return new String(w);
+
+    }    
+
+    
+
+	//HTTP通信
+
+   public static byte[] http2data(String path) throws Exception {
+
+        HttpURLConnection c=null;
+
+        InputStream in=null;
+
+        ByteArrayOutputStream out=null;
+
+        try {
+
+           //HTTP接続のオープン(2)
+
+            URL url=new URL(path);
+
+            c=(HttpURLConnection)url.openConnection();
+
+            c.setRequestMethod("GET");
+
+            c.connect();
+
+            in=c.getInputStream();
+
+
+            in.close();
+
+            c.disconnect();
+
+            return out.toByteArray();
+
+        } catch (Exception e) {
+
+            try {
+
+                if (c!=null) c.disconnect();
+
+                if (in!=null) in.close();
+
+                if (out!=null) out.close();
+
+            } catch (Exception e2) {
+
+            }
+
+            throw e;
+
+        }
+    }     
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
